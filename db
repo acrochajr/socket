@@ -1,0 +1,7 @@
+db.places.insert( {
+    nome: "Central Park",
+   location: { type: "Point", coordinates: [ -73.97, 40.77 ] },
+   category: "Viagem solicitada",
+   solicitante: "Passagueiro",
+   horario: "data+horario"
+} );

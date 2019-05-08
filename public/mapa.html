@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <title>Google Map</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <style>
+          #map {
+            height: 300px;
+            width: 600px;
+          }
+
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font: 13px Helvetica, Arial; }
+          form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }*/
+          form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+          form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+          #messages { list-style-type: none; margin: 0; padding: 0; }
+          #messages li { padding: 5px 10px; }
+          #messages li:nth-child(odd) { background: #eee; }
+          #messages { margin-bottom: 40px }
+
+        </style>
+    </head>
+    <body>
+      <div class="container">
+     
+
+        <div style="padding:10px">
+            <div id="map"></div>
+        </div>
+      </div>
+
+        
+        <div>
+          <ul id="messages"></ul>
+          <div id="latmoved"></div>
+          <div id="longmoved"></div>
+          <div id="latclicked" ></div>
+          <div id="longclicked"></div>      
+    <form action="" class="form-group">
+   
+       <input id="m" autocomplete="off" value=""/><button>Send</button>
+      
+    </form>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script type="text/javascript">
+      var map;
+
+      function initMap() {
+          var latitude = -26.910956; // YOUR LATITUDE VALUE
+          var longitude = -48.670854; // YOUR LONGITUDE VALUE
+
+          var myLatLng = {lat: latitude, lng: longitude};
+
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: myLatLng,
+            zoom: 14,
+            disableDoubleClickZoom: true, // disable the default map zoom on double click
+          });
+
+          // Update lat/long value of div when anywhere in the map is clicked
+          google.maps.event.addListener(map,'click',function(event) {
+            document.getElementById('latclicked').innerHTML = event.latLng.lat();
+              document.getElementById('longclicked').innerHTML =  event.latLng.lng();
+             // console.log(event.latLng.lat(), event.latLng.lng());
+          });
+
+          // Update lat/long value of div when you move the mouse over the map
+          google.maps.event.addListener(map,'mousemove',function(event) {
+              document.getElementById('latmoved').innerHTML = event.latLng.lat();
+              document.getElementById('longmoved').innerHTML = event.latLng.lng();
+             
+          });
+
+          var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+            //title: 'Hello World'
+
+            // setting latitude & longitude as title of the marker
+            // title is shown when you hover over the marker
+            title: latitude + ', ' + longitude
+          });
+
+          // Update lat/long value of div when the marker is clicked
+          marker.addListener('click', function(event) {
+            document.getElementById('latclicked').innerHTML = event.latLng.lat();
+            document.getElementById('longclicked').innerHTML =  event.latLng.lng();
+          });
+
+          // Create new marker on double click event on the map
+          google.maps.event.addListener(map,'dblclick',function(event) {
+              var marker = new google.maps.Marker({
+                position: event.latLng,
+                map: map,
+                title: event.latLng.lat()+', '+event.latLng.lng()
+              });
+
+              // Update lat/long value of div when the marker is clicked
+              marker.addListener('click', function() {
+                document.getElementById('latclicked').innerHTML = event.latLng.lat();
+                document.getElementById('longclicked').innerHTML =  event.latLng.lng();
+            
+              });
+          });
+          
+          // Create new marker on single click event on the map
+          /*google.maps.event.addListener(map,'click',function(event) {
+              var marker = new google.maps.Marker({
+                position: event.latLng,
+                map: map,
+                title: event.latLng.lat()+', '+event.latLng.lng()
+              });
+          });*/
+        }
+      </script>
+      <script>
+        
+        $("#map").click(function(){
+          let latidude = $("#latclicked").text()
+          let longitude = $("#longclicked").text()
+          let campo  = $("#m")
+
+          campo.val(latidude+' | '+longitude)
+
+          console.log($("#latclicked").text())
+        })
+      
+
+       $(function () {
+          var socket = io();
+          
+          console.log(latclicked);
+          $('form').submit(function(){
+            socket.emit('chat message', $('#m').val()); 
+               $('#m').val();
+            return false;
+          });
+          
+          socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            window.scrollTo(0, document.body.scrollHeight);
+          });
+        });
+
+      </script>
+        </div>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUjXcRTQEs78xVtjycJMZTA-XdoRwOAdU&callback=initMap"
+        async defer></script>
+    </body>
+</html>
